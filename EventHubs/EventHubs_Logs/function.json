@@ -1,0 +1,14 @@
+{
+ "scriptFile": "log_sender.py"
+ "bindings": [
+   {
+     "type": "eventHubTrigger",
+     "name": "eventHubMessages",
+     "direction": "in",
+     "path": "insights-operational-logs",
+     "connection": "AzureEventHubConnectionString",
+     "cardinality": "many",
+     "consumerGroup": "$Default"
+   }
+ ]
+}
