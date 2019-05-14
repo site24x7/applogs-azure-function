@@ -6,7 +6,7 @@
      "name": "eventHubMessages",
      "direction": "in",
      "eventHubName": "s247-operational-logs",
-     "connection": "AzureEventHubConnectionString",
+     "path": "AzureEventHubConnectionString",
      "cardinality": "many",
      "consumerGroup": "$Default"
    },
@@ -14,7 +14,7 @@
    {
      "type": "blob",
      "name": "outputBlob",
-     "eventHubName": "s247-azureaudit-failover/{rand-guid}",
+     "path": "s247-azureaudit-failover/{rand-guid}",
      "connection": "StorageConnectionString",
      "direction": "out"
    }
