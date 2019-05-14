@@ -1,4 +1,5 @@
 {
+  "version" : "2.0"
   "eventHub": {
     "maxBatchSize": 64,
     "prefetchCount": 256,
