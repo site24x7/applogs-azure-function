@@ -23,7 +23,7 @@ def is_filters_matched(formatted_line):
                 return False
     return True
 
-def get_json_value(obj, key, type):
+def get_json_value(obj, key, type=None):
     if key in obj:
         if type and type == 'json-object':
             arr_json = []
@@ -57,7 +57,7 @@ def json_log_parser(lines_read):
 
 def send_logs_to_s247(gzipped_parsed_lines, log_size):
     header_obj = {'X-DeviceKey': logtype_config['apiKey'], 'X-LogType': logtype_config['logType'],
-                  'X-StreamMode' :1, 'Log-Size': log_size, 'Content-Type' : 'application/json', 'Content-Encoding' : 'gzip', 'User-Agent' : 'AWS-Lambda'
+                  'X-StreamMode' :1, 'Log-Size': log_size, 'Content-Type' : 'application/json', 'Content-Encoding' : 'gzip', 'User-Agent' : 'AZURE-Function'
     }
     upload_url = 'https://'+logtype_config['uploadDomain']+'/upload'
     request = urllib.request.Request(upload_url, headers=header_obj)
