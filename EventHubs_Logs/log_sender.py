@@ -3,10 +3,8 @@ import sys, os, re, gzip, json, urllib.parse, urllib.request, traceback, datetim
 import azure.functions as func
 from base64 import b64decode
 
-
-logtype_config = json.loads(b64decode(os.environ['logTypeConfig']).decode('utf-8'))
-
-s247_datetime_format_string = logtype_config['dateFormat']
+logtype_config = None
+s247_datetime_format_string = None
 
 def get_timestamp(datetime_string):
     try:
@@ -28,7 +26,7 @@ def get_json_value(obj, key, type=None):
         if type and type == 'json-object':
             arr_json = []
             for child_key in obj[key]:
-                arr_json.append({'key' : child_key, 'value': obj[key][child_key]})
+                arr_json.append({'key' : child_key, 'value': str(obj[key][child_key])})
             return arr_json
         else:
             return obj[key]
@@ -38,7 +36,7 @@ def get_json_value(obj, key, type=None):
         return get_json_value(obj[parent_key], child_key)
 
 def json_log_parser(lines_read):
-    log_size = 0;
+    log_size = 0
     parsed_lines = []
     for event_obj in lines_read:
         formatted_line = {}
@@ -69,10 +67,22 @@ def send_logs_to_s247(gzipped_parsed_lines, log_size):
         logging.info('%s :Problem in uploading to site24x7 status %s, Reason : %s', dict_responseHeaders['x-uploadid'], s247_response.status, s247_response.read())
 
 def main(eventMessages: func.EventHubEvent):
-    logging.info('S247 Function triggered to process a message')
     try:
+        global logtype_config, s247_datetime_format_string
         payload = json.loads(eventMessages.get_body().decode('utf-8'))
         log_events = payload[0]['records']
+        log_category = (log_events[0]['category']).replace('-', '_')
+        print("log_category" + " : "+ log_category)
+        log_category = 'S247_'+log_category
+        if log_category in os.environ:
+            print("log_category found in input arguments")
+            logtype_config = json.loads(b64decode(os.environ[log_category]).decode('utf-8'))
+            s247_datetime_format_string = logtype_config['dateFormat']
+        else:
+            logtype_config = json.loads(b64decode(os.environ['logTypeConfig']).decode('utf-8'))
+            s247_datetime_format_string = logtype_config['dateFormat']
+
+
         if 'jsonPath' in logtype_config:
             parsed_lines, log_size = json_log_parser(log_events)
 
