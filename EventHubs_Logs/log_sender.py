@@ -21,19 +21,26 @@ def is_filters_matched(formatted_line):
                 return False
     return True
 
-def get_json_value(obj, key, type=None):
-    if key in obj:
-        if type and type == 'json-object':
+def get_json_value(obj, key, datatype=None):
+    if key in obj or key.lower() in obj:
+        if datatype and datatype == 'json-object':
             arr_json = []
-            for child_key in obj[key]:
-                arr_json.append({'key' : child_key, 'value': str(obj[key][child_key])})
+            child_obj = obj[key]
+            if type(child_obj) is str:
+                child_obj = json.loads(child_obj.replace('\\','\\\\'), strict=False)
+
+            for child_key in child_obj:
+                arr_json.append({'key' : child_key, 'value': str(child_obj[child_key])})
             return arr_json
         else:
-            return obj[key]
+            return obj[key] if key in obj else obj[key.lower()]
     elif '.' in key:
         parent_key = key[:key.index('.')]
         child_key = key[key.index('.')+1:]
-        return get_json_value(obj[parent_key], child_key)
+        child_obj = obj[parent_key]
+        if type(child_obj) is str:
+            child_obj = json.loads(child_obj.replace('\\','\\\\'), strict=False)
+        return get_json_value(child_obj, child_key)
 
 def json_log_parser(lines_read):
     log_size = 0
@@ -53,7 +60,8 @@ def json_log_parser(lines_read):
                 formatted_line['s247agentuid'] = event_obj['resourceId'].split('/')[4]
             parsed_lines.append(formatted_line)
         except Exception as e:
-            print('unable to parse event message : '+str(e))
+            print('unable to parse event message : ',event_obj)
+            traceback.print_exc()
             pass
     return parsed_lines, log_size
 
@@ -79,10 +87,14 @@ def main(eventMessages: func.EventHubEvent):
             cardinality = 'one'
         for eventMessage in eventMessages:
             payload = json.loads(eventMessage.get_body().decode('utf-8'))
-            log_events = payload['records'] if cardinality == 'many' else payload[0]['records'] 
-            log_category = (log_events[0]['category']).replace('-', '_')
-            print("log_category" + " : "+ log_category)
-            log_category = 'S247_'+log_category
+            log_events = payload['records'] if cardinality == 'many' else payload[0]['records']
+
+            log_category = ''
+            if 'category' in log_events[0]: 
+                log_category = (log_events[0]['category']).replace('-', '_')
+                print("log_category" + " : "+ log_category)
+                log_category = 'S247_'+log_category
+
             if log_category in os.environ:
                 print("log_category found in input arguments")
                 logtype_config = json.loads(b64decode(os.environ[log_category]).decode('utf-8'))
@@ -101,3 +113,4 @@ def main(eventMessages: func.EventHubEvent):
     except Exception as e:
         traceback.print_exc()
         raise e
+    
