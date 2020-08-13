@@ -90,8 +90,8 @@ def main(eventMessages: func.EventHubEvent):
             log_events = payload['records'] if cardinality == 'many' else payload[0]['records']
 
             log_category = ''
-            if 'category' in log_events[0]: 
-                log_category = (log_events[0]['category']).replace('-', '_')
+            if 'category' in log_events[0] or 'Category' in log_events[0]: 
+                log_category = (log_events[0]['category' if 'category' in log_events[0] else 'Category']).replace('-', '_')
                 print("log_category" + " : "+ log_category)
                 log_category = 'S247_'+log_category
 
@@ -99,10 +99,11 @@ def main(eventMessages: func.EventHubEvent):
                 print("log_category found in input arguments")
                 logtype_config = json.loads(b64decode(os.environ[log_category]).decode('utf-8'))
                 s247_datetime_format_string = logtype_config['dateFormat']
-            else:
+            elif 'logTypeConfig' in os.environ:
                 logtype_config = json.loads(b64decode(os.environ['logTypeConfig']).decode('utf-8'))
                 s247_datetime_format_string = logtype_config['dateFormat']
-    
+            else:
+                return
     
             if 'jsonPath' in logtype_config:
                 parsed_lines, log_size = json_log_parser(log_events)
@@ -113,4 +114,3 @@ def main(eventMessages: func.EventHubEvent):
     except Exception as e:
         traceback.print_exc()
         raise e
-    
