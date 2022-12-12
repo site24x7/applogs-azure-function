@@ -1,4 +1,3 @@
-
 import sys, os, re, gzip, json, urllib.parse, urllib.request, traceback, datetime, calendar, logging, hashlib, ast
 import azure.functions as func
 from base64 import b64decode
@@ -182,6 +181,12 @@ def main(eventMessages: func.EventHubEvent):
                 print("log_category" + " : "+ log_category)
                 log_category = 'S247_'+log_category
 
+            elif 'Identifier' in os.environ:
+                for each in os.environ['Identifier'].split(","):
+                    if each in log_events[0]:
+                        log_category = 'S247_'+log_events[0][each]
+                        break
+                      
             if log_category in os.environ:
                 print("log_category found in input arguments")
                 logtype_config = json.loads(b64decode(os.environ[log_category]).decode('utf-8'))
