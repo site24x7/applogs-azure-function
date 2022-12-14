@@ -56,6 +56,7 @@ def get_json_value(obj, key, datatype=None):
 
 def json_log_parser(lines_read):
     global log_size
+    log_size = 0
     parsed_lines = []
     for event_obj in lines_read:
         try:
