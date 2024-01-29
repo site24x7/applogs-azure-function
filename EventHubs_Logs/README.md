@@ -14,4 +14,4 @@ You can configure an automated deployment by following the steps mentioned in th
 
 ### Architecture 
 
-![Architecture](https://github.com/site24x7/applogs-azure-function/tree/master/Images/EventHubs_Logs/Architecture.png?raw=true)
+![Architecture](Images/EventHubs_Logs/Architecture.png)
