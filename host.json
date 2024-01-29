@@ -13,8 +13,6 @@
 		"batchCheckpointFrequency": 1
 	}
   },
-  "functions": [
-    "EventHubs_Logs"
-  ],
+  "functions": [],
   "functionTimeout": "00:05:00"
 }
