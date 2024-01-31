@@ -1,8 +1,8 @@
-# Forwards logs from Azure Blob Storage
+# Forwards Azure NSG logs from Azure Storage Account
 
 Configure network security group (NSG) flow logs to be sent to [AppLogs](https://www.site24x7.com/help/log-management/) to monitor, analyze, and visualize network traffic in your Azure environment.
 
-You can configure an automated deployment by following the steps mentioned in this [document](https://www.site24x7.com/help/log-management/).
+You can configure an automated deployment by following the steps mentioned in this [document](https://www.site24x7.com/help/log-management/azure-nsg-flow-logs.html).
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsite24x7%2Fapplogs-azure-function%2Fmaster%2Fdeployment%2Fsite24x7-azure-nsgflow-logs-deployment.json)
 
