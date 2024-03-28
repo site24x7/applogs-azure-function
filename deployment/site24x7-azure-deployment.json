@@ -9,7 +9,11 @@
 	"logTypeConfig": {
             "defaultValue": "Enter Log Type Config String",
             "type": "String"
-        }
+        },
+    "debugMode":{
+        "defaultValue": "False",
+        "type": "string"
+    }
     },
     "variables": {
 	"suffix": "[substring(toLower(uniqueString(resourceGroup().id, resourceGroup().location)),0,5)]",

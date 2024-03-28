@@ -180,10 +180,16 @@ def main(eventMessages: func.EventHubEvent):
         if type(eventMessages) != list:
             eventMessages = [eventMessages]
             cardinality = 'one'
+        debugLogEvent = True
         for eventMessage in eventMessages:
             payload = json.loads(eventMessage.get_body().decode('utf-8'))
             log_events = payload['records'] if cardinality == 'many' else payload[0]['records']
-
+            try:
+                if ast.literal_eval(os.environ['debugMode']) and debugLogEvent:
+                    print("Debug event : ",str(log_events[0]))
+                    debugLogEvent = False
+            except Exception:
+                pass
             log_category = ''
             if 'category' in log_events[0] or 'Category' in log_events[0]:
                 log_category = (log_events[0]['category' if 'category' in log_events[0] else 'Category']).replace('-', '_')
