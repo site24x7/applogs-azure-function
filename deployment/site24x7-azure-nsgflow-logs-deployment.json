@@ -36,7 +36,7 @@
 	    "funcStorageName": "[tolower(concat(substring(parameters('name'), 0, min(length(parameters('name')),16)), 'stg', variables('suffix')))]",
         "functionName" : "[concat(parameters('name'), '-Function-', variables('suffix'))]",
         "serverFarmName" : "[concat(parameters('name'), '-AppServicePlan-', variables('suffix'))]",
-        "RepoURL": "https://github.com/aneshpugal/nsgssimple.git",
+        "RepoURL": "https://github.com/site24x7/applogs-azure-function.git",
         "Branch": "main",
         "RootManageSharedAccessKey_name" : "RootManageSharedAccessKey"
      },
