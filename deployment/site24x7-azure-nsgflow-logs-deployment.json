@@ -37,7 +37,7 @@
         "functionName" : "[concat(parameters('name'), '-Function-', variables('suffix'))]",
         "serverFarmName" : "[concat(parameters('name'), '-AppServicePlan-', variables('suffix'))]",
         "RepoURL": "https://github.com/site24x7/applogs-azure-function.git",
-        "Branch": "main",
+        "Branch": "master",
         "RootManageSharedAccessKey_name" : "RootManageSharedAccessKey"
      },
     "resources": [
