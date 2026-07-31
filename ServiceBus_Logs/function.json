@@ -1,0 +1,13 @@
+{
+ "scriptFile": "log_sender.py",
+ "bindings": [
+   {
+     "type": "serviceBusTrigger",
+     "name": "messages",
+     "direction": "in",
+     "queueName": "%ServiceBusQueueName%",
+     "connection": "AzureServiceBusConnectionString",
+     "cardinality": "many"
+   }
+ ]
+}
