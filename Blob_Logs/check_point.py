@@ -6,7 +6,7 @@ import logging
 class check_point:
     def __init__(self,connection_string):
         self.connection_string = connection_string
-        self.table_name = "check_points"
+        self.table_name = "Checkpoints"
 
     def entityMethod(self,partitionKey,rowKey,index):
         return {

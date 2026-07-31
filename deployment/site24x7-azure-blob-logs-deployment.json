@@ -3,45 +3,57 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "name": {
-            "defaultValue": "Site24x7AzureNSGLogs",
+            "defaultValue": "Site24x7AzureBlobLogs",
             "type": "string"
         },
         "blobconnectionstring": {
             "type": "securestring",
             "metadata": {
-                "description" : "Enter the connection string from which you wish to collect logs from."
+                "description": "Enter the connection string from which you wish to collect logs from."
             }
         },
         "logTypeConfig": {
             "type": "string",
             "defaultValue": "Enter the logTypeConfig value",
             "metadata": {
-                "description" : "Enter the logTypeConfig value copied from Site24x7 Log profile page"
+                "description": "Enter the logTypeConfig value copied from Site24x7 Log profile page"
             }
         },
         "LogCollectionStartTime": {
             "type": "int",
             "defaultValue": "[dateTimeToEpoch(utcNow())]",
             "metadata": {
-                "description" : "Enter the epoch time from which you wish to collect logs from"
+                "description": "Enter the epoch time from which you wish to collect logs from"
             }
+        },
+        "Tail": {
+            "defaultValue": "True",
+            "metadata": {
+                "description": "For other than block blobs input False"
+            },
+            "type": "string"
+        },
+        "ContainerName": {
+            "metadata": {
+                "description": "Enter the container name from which you wish to collect logs"
+            },
+            "type": "string"
         }
     },
-    
     "variables": {
-	    "suffix": "[substring(toLower(uniqueString(resourceGroup().id, resourceGroup().location)),0,5)]",
-	    "subscriptionid": "[subscription().subscriptionId]",
-        "location" :  "[resourceGroup().location]",
-        "linuxFxVersion" : "PYTHON|3.11",
-	    "funcStorageName": "[tolower(concat(substring(parameters('name'), 0, min(length(parameters('name')),16)), 'stg', variables('suffix')))]",
-        "functionName" : "[concat(parameters('name'), '-Function-', variables('suffix'))]",
-        "serverFarmName" : "[concat(parameters('name'), '-AppServicePlan-', variables('suffix'))]",
+        "suffix": "[substring(toLower(uniqueString(resourceGroup().id, resourceGroup().location)),0,5)]",
+        "subscriptionid": "[subscription().subscriptionId]",
+        "location": "[resourceGroup().location]",
+        "linuxFxVersion": "PYTHON|3.11",
+        "funcStorageName": "[tolower(concat(substring(parameters('name'), 0, min(length(parameters('name')),16)), 'stg', variables('suffix')))]",
+        "functionName": "[concat(parameters('name'), '-Function-', variables('suffix'))]",
+        "serverFarmName": "[concat(parameters('name'), '-AppServicePlan-', variables('suffix'))]",
         "RepoURL": "https://github.com/site24x7/applogs-azure-function.git",
         "Branch": "master",
-        "RootManageSharedAccessKey_name" : "RootManageSharedAccessKey"
-     },
+        "RootManageSharedAccessKey_name": "RootManageSharedAccessKey"
+    },
     "resources": [
-	    {
+        {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2020-06-01",
             "name": "[variables('serverFarmName')]",
@@ -63,7 +75,7 @@
                 "targetWorkerSizeId": 0
             }
         },
-		{
+        {
             "apiVersion": "2019-06-01",
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[ variables('funcStorageName')]",
@@ -73,7 +85,7 @@
             },
             "properties": {
                 "supportsHttpsTrafficOnly": false,
-		        "encryption": {
+                "encryption": {
                     "services": {
                         "file": {
                             "enabled": true
@@ -95,7 +107,7 @@
             "tags": {},
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/',  variables('funcStorageName'))]"                
+                "[resourceId('Microsoft.Storage/storageAccounts/',  variables('funcStorageName'))]"
             ],
             "properties": {
                 "name": "[variables('functionName')]",
@@ -106,21 +118,21 @@
                 "siteConfig": {
                     "appSettings": [
                         {
-                            "name": "FUNCTIONS_WORKER_RUNTIME", 
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
                             "value": "python"
                         },
                         {
-                            "name": "FUNCTIONS_EXTENSION_VERSION", 
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~4"
                         },
-			            {
-                            "name": "logTypeConfig", 
-                            "value" : "[parameters('logTypeConfig')]"
+                        {
+                            "name": "logTypeConfig",
+                            "value": "[parameters('logTypeConfig')]"
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('funcStorageName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('funcStorageName')),'2019-06-01').keys[0].value)]"
-                        },                         
+                        },
                         {
                             "name": "FUNCTION_APP_EDIT_MODE",
                             "value": "readwrite"
@@ -136,6 +148,38 @@
                         {
                             "name": "LogCollectionStartTime",
                             "value": "[parameters('LogCollectionStartTime')]"
+                        },
+                        {
+                            "name": "Tail",
+                            "value": "[parameters('Tail')]"
+                        },
+                        {
+                            "name": "ContainerName",
+                            "value": "[parameters('ContainerName')]"
+                        },
+                        {
+                            "name": "AzureWebJobs.EventHubs_Logs.Disabled",
+                            "value": "true"
+                        },
+                        {
+                            "name": "AzureWebJobs.ServiceBus_Logs.Disabled",
+                            "value": "true"
+                        },
+                        {
+                            "name": "ServiceBusQueueName",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                            "value": "true"
+                        },
+                        {
+                            "name": "ENABLE_ORYX_BUILD",
+                            "value": "true"
+                        },
+                        {
+                            "name": "BUILD_FLAGS",
+                            "value": "Off"
                         }
                     ],
                     "linuxFxVersion": "[variables('linuxFxVersion')]",
@@ -148,7 +192,7 @@
                     "name": "web",
                     "type": "sourcecontrols",
                     "dependsOn": [
-                      "[resourceId('Microsoft.Web/sites/', variables('functionName'))]"
+                        "[resourceId('Microsoft.Web/sites/', variables('functionName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "[variables('RepoURL')]",
@@ -156,8 +200,8 @@
                         "publishRunbook": true,
                         "IsManualIntegration": true
                     }
-               }
+                }
             ]
         }
-	]
+    ]
 }

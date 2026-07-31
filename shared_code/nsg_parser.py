@@ -10,10 +10,10 @@ field_mapping = {
         "TrafficDestination": 6,
         "TrafficAction": 7,
         "Priority": 8,
-        "BytesSent": 9,
-        "BytesReceived": 10,
-        "PacketsSent": 11,
-        "PacketsReceived": 12,
+        "PacketsSent": 9,
+        "BytesSent": 10,
+        "PacketsReceived": 11,
+        "BytesReceived": 12,
     }
     
 def processData(dataList,log_line_filter):
@@ -40,7 +40,8 @@ def processData(dataList,log_line_filter):
                 formatted_line["Protocol"] = "TCP" if formatted_line["Protocol"] == "T" else "UDP"
                 formatted_line["TrafficAction"] = "Accept" if formatted_line["TrafficAction"] == "A" else "Denied"
                 formatted_line.update(metadata)
-                parsed_line,_ = log_line_filter(formatted_line)
-                parsed_lines.append(parsed_line)
-                log_size+= _
+                parsed_line, size = log_line_filter(formatted_line)
+                if parsed_line:
+                    parsed_lines.append(parsed_line)
+                    log_size += size
     return parsed_lines,log_size
